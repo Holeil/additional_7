@@ -3,12 +3,12 @@ module.exports = function solveSudoku(matrix) {
     this.name = name;
     this.num = num;
   }
-  //////////////////////////////////////////////////////////////////////////////
-  function analize(x, y) {
+  ////////////////////////////////////////////////////////////////////////////
+  function analize(x, y, array) {
     for(let i = 0; i < 9; i++) {
       for(let z = 0; z < 9; z++) {
-        if((matrix[z][y].name == matrix[x][y].num[i]) ||
-        (matrix[x][z].name == matrix[x][y].num[i])) matrix[x][y].num[i] = 0;
+        if((array[z][y].name == array[x][y].num[i]) ||
+        (array[x][z].name == array[x][y].num[i])) array[x][y].num[i] = 0;
       }
       let q = 0, qc = 3, w = 0, wc = 3;
       if(x != 0) {
@@ -21,33 +21,35 @@ module.exports = function solveSudoku(matrix) {
       }
       while(q < qc) {
         while(w < wc) {
-          if((matrix[q][w].name != 0) &&
-          (matrix[q][w].name == matrix[x][y].num[i])) matrix[x][y].num[i] = 0;
+          if((array[q][w].name != 0) &&
+          (array[q][w].name == array[x][y].num[i])) array[x][y].num[i] = 0;
           w++;
         }
         q++;
         w-=3;
       }
     }
+    return array;
   }
-  //////////////////////////////////////////////////////////////////////////////
-  function update(x, y) {
+  ////////////////////////////////////////////////////////////////////////////
+  function update(x, y, array) {
     let count = 0, n;
     for(let i = 0; i < 9; i++) {
-      if(matrix[x][y].num[i] != 0) {
+      if(array[x][y].num[i] != 0) {
         count++;
-        n = matrix[x][y].num[i];
+        n = array[x][y].num[i];
       }
     }
     if(count == 1) {
-      matrix[x][y].name = n;
-      matrix[x][y].num = [];
+      array[x][y].name = n;
+      array[x][y].num = [];
     }
+    return array;
   }
-  function rowAnalize(x, y) {
+  function rowAnalize(x, y, array) {
     for(let i = 0; i < 9; i++) {
-      if(matrix[x][y].num[i] != 0) {
-        ////////////////////////////////////////////////////////////////////////
+      if(array[x][y].num[i] != 0) {
+        //////////////////////////////////////////////////////////////////////
         let y1=undefined, y2=undefined, count = 0;
         let w = 0, wc = 3;
         if(y != 0) {
@@ -55,7 +57,7 @@ module.exports = function solveSudoku(matrix) {
           wc=w+3;
         }
         while(w < wc) {
-          if((w != y) && (matrix[x][w].name == 0) && (matrix[x][w].num[i]==matrix[x][y].num[i])) {
+          if((w != y) && (array[x][w].name == 0) && (array[x][w].num[i]==array[x][y].num[i])) {
             if(count == 0) {
               y1 = w;
               count++;
@@ -77,10 +79,10 @@ module.exports = function solveSudoku(matrix) {
         }
         while(r < rc) {
           while(t < tc) {
-            if(matrix[r][t] != matrix[x][y]) {
-              if((y1 == undefined) || (matrix[r][t] != matrix[x][y1])) {
-                if((y2 == undefined) || (matrix[r][t] != matrix[x][y2])) {
-                  if(matrix[r][t].num[i] == matrix[x][y].num[i]) key = 1;
+            if(array[r][t] != array[x][y]) {
+              if((y1 == undefined) || (array[r][t] != array[x][y1])) {
+                if((y2 == undefined) || (array[r][t] != array[x][y2])) {
+                  if(array[r][t].num[i] == array[x][y].num[i]) key = 1;
                 }
               }
             }
@@ -91,17 +93,17 @@ module.exports = function solveSudoku(matrix) {
         }
         if(key == 0) {
           for(var e = 0; e < 9; e++) {
-            if((e != y) && (matrix[x][e].num[i] == matrix[x][y].num[i])) {
+            if((e != y) && (array[x][e].num[i] == array[x][y].num[i])) {
               if((y1 == undefined) || (e != y1)) {
                 if((y2 == undefined) || (e != y2)) {
-                  matrix[x][e].num[i] = 0;
+                  array[x][e].num[i] = 0;
                 }
               }
             }
           }
         }
 
-        ////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////
         w = 0; wc = 3; y1 = undefined; y2 = undefined; count = 0;
         if(y != 0) {
           w=y-y%3;
@@ -109,7 +111,7 @@ module.exports = function solveSudoku(matrix) {
         }
 
         while(w < wc) {
-          if((w != y) && (matrix[x][w] == 0) && (matrix[x][w].num[i] == matrix[x][y].num[i])) {
+          if((w != y) && (array[x][w] == 0) && (array[x][w].num[i] == array[x][y].num[i])) {
             if(count == 0) {
               y1 = w;
               count++;
@@ -125,7 +127,7 @@ module.exports = function solveSudoku(matrix) {
           if(z != y) {
             if((y1 == undefined) || (z != y1)) {
               if((y2 == undefined) || (z != y2)) {
-                if(matrix[x][z].num[i] == matrix[x][y].num[i]) key = 1;
+                if(array[x][z].num[i] == array[x][y].num[i]) key = 1;
               }
             }
           }
@@ -142,10 +144,10 @@ module.exports = function solveSudoku(matrix) {
           }
           while(r < rc) {
             while(t < tc) {
-              if(matrix[r][t] != matrix[x][y]) {
-                if((y1 == undefined) || (matrix[r][t] != matrix[x][y1])) {
-                  if((y2 == undefined) || (matrix[r][t] != matrix[x][y2])) {
-                    if(matrix[r][t].num[i] == matrix[x][y].num[i]) matrix[r][t].num[i] = 0;
+              if(array[r][t] != array[x][y]) {
+                if((y1 == undefined) || (array[r][t] != array[x][y1])) {
+                  if((y2 == undefined) || (array[r][t] != array[x][y2])) {
+                    if(array[r][t].num[i] == array[x][y].num[i]) array[r][t].num[i] = 0;
                   }
                 }
               }
@@ -157,12 +159,13 @@ module.exports = function solveSudoku(matrix) {
         }
       }
     }
+    return array;
   }
-  //////////////////////////////////////////////////////////////////////////////
-  function columnAnalize(x, y) {
+  ////////////////////////////////////////////////////////////////////////////
+  function columnAnalize(x, y, array) {
     for(let i = 0; i < 9; i++) {
-      if(matrix[x][y].num[i] != 0) {
-        ////////////////////////////////////////////////////////////////////////
+      if(array[x][y].num[i] != 0) {
+        //////////////////////////////////////////////////////////////////////
         let x1=undefined, x2=undefined, count = 0;
         let q = 0, qc = 3;
         if(x != 0) {
@@ -170,7 +173,7 @@ module.exports = function solveSudoku(matrix) {
           qc=q+3;
         }
         while(q < qc) {
-          if((q != y) && (matrix[q][y].name == 0) && (matrix[q][y].num[i]==matrix[x][y].num[i])) {
+          if((q != y) && (array[q][y].name == 0) && (array[q][y].num[i]==array[x][y].num[i])) {
             if(count == 0) {
               x1 = q;
               count++;
@@ -192,10 +195,10 @@ module.exports = function solveSudoku(matrix) {
         }
         while(r < rc) {
           while(t < tc) {
-            if(matrix[r][t] != matrix[x][y]) {
-              if((x1 == undefined) || (matrix[r][t] != matrix[x1][y])) {
-                if((x2 == undefined) || (matrix[r][t] != matrix[x2][y])) {
-                  if(matrix[r][t].num[i] == matrix[x][y].num[i]) key = 1;
+            if(array[r][t] != array[x][y]) {
+              if((x1 == undefined) || (array[r][t] != array[x1][y])) {
+                if((x2 == undefined) || (array[r][t] != array[x2][y])) {
+                  if(array[r][t].num[i] == array[x][y].num[i]) key = 1;
                 }
               }
             }
@@ -206,17 +209,17 @@ module.exports = function solveSudoku(matrix) {
         }
         if(key == 0) {
           for(var e = 0; e < 9; e++) {
-            if((e != y) && (matrix[e][y].num[i] == matrix[x][y].num[i])) {
+            if((e != y) && (array[e][y].num[i] == array[x][y].num[i])) {
               if((x1 == undefined) || (e != x1)) {
                 if((x2 == undefined) || (e != x2)) {
-                  matrix[e][y].num[i] = 0;
+                  array[e][y].num[i] = 0;
                 }
               }
             }
           }
         }
 
-        ////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////
         q = 0; qc = 3; x1 = undefined; x2 = undefined; count = 0;
         if(x != 0) {
           q=x-x%3;
@@ -224,7 +227,7 @@ module.exports = function solveSudoku(matrix) {
         }
 
         while(q < qc) {
-          if((q != x) && (matrix[q][y] == 0) && (matrix[q][y].num[i] == matrix[x][y].num[i])) {
+          if((q != x) && (array[q][y] == 0) && (array[q][y].num[i] == array[x][y].num[i])) {
             if(count == 0) {
               x1 = q;
               count++;
@@ -240,7 +243,7 @@ module.exports = function solveSudoku(matrix) {
           if(z != x) {
             if((x1 == undefined) || (z != x1)) {
               if((x2 == undefined) || (z != x2)) {
-                if(matrix[z][y].num[i] == matrix[x][y].num[i]) key = 1;
+                if(array[z][y].num[i] == array[x][y].num[i]) key = 1;
               }
             }
           }
@@ -257,10 +260,10 @@ module.exports = function solveSudoku(matrix) {
           }
           while(r < rc) {
             while(t < tc) {
-              if(matrix[r][t] != matrix[x][y]) {
-                if((x1 == undefined) || (matrix[r][t] != matrix[x1][y])) {
-                  if((x2 == undefined) || (matrix[r][t] != matrix[x2][y])) {
-                    if(matrix[r][t].num[i] == matrix[x][y].num[i]) matrix[r][t].num[i] = 0;
+              if(array[r][t] != array[x][y]) {
+                if((x1 == undefined) || (array[r][t] != array[x1][y])) {
+                  if((x2 == undefined) || (array[r][t] != array[x2][y])) {
+                    if(array[r][t].num[i] == array[x][y].num[i]) array[r][t].num[i] = 0;
                   }
                 }
               }
@@ -272,37 +275,38 @@ module.exports = function solveSudoku(matrix) {
         }
       }
     }
+    return array;
   }
-  //////////////////////////////////////////////////////////////////////////////
-  function oneInPozition(x, y) {
+  ////////////////////////////////////////////////////////////////////////////
+  function oneInPozition(x, y, array) {
     for(let i = 0; i < 9; i++) {
-      if(matrix[x][y].num[i] != 0) {
+      if(array[x][y].num[i] != 0) {
         let key = 0;
         for(let z = 0; z < 9; z++) {
-          if((z != y) && (matrix[x][z].name == 0)) {
-            if(matrix[x][z].num[i] == matrix[x][y].num[i]) {
+          if((z != y) && (array[x][z].name == 0)) {
+            if(array[x][z].num[i] == array[x][y].num[i]) {
               key = 1;
               break;
             }
           }
         }
         if(key == 0) {
-          matrix[x][y].name = matrix[x][y].num[i];
-          matrix[x][y].num = [];
+          array[x][y].name = array[x][y].num[i];
+          array[x][y].num = [];
           break;
         }
         else key = 0;
         for(let z = 0; z < 9; z++) {
-          if((z != x) && (matrix[z][y].name == 0)) {
-            if(matrix[z][y].num[i] == matrix[x][y].num[i]) {
+          if((z != x) && (array[z][y].name == 0)) {
+            if(array[z][y].num[i] == array[x][y].num[i]) {
               key = 1;
               break;
             }
           }
         }
         if(key == 0) {
-          matrix[x][y].name = matrix[x][y].num[i];
-          matrix[x][y].num = [];
+          array[x][y].name = array[x][y].num[i];
+          array[x][y].num = [];
           break;
         }
         else key = 0;
@@ -317,8 +321,8 @@ module.exports = function solveSudoku(matrix) {
         }
         while(q < qc) {
           while(w < wc) {
-            if((matrix[q][w] != matrix[x][y]) && (matrix[q][w].name == 0)) {
-              if(matrix[q][w].num[i] == matrix[x][y].num[i]) {
+            if((array[q][w] != array[x][y]) && (array[q][w].name == 0)) {
+              if(array[q][w].num[i] == array[x][y].num[i]) {
                 key = 1;
                 break;
               }
@@ -330,22 +334,23 @@ module.exports = function solveSudoku(matrix) {
           w-=3;
         }
         if(key == 0) {
-          matrix[x][y].name = matrix[x][y].num[i];
-          matrix[x][y].num = [];
+          array[x][y].name = array[x][y].num[i];
+          array[x][y].num = [];
           break;
         }
       }
     }
+    return array;
   }
-  //////////////////////////////////////////////////////////////////////////////
-  function postAnalize(x, y) {
+  ////////////////////////////////////////////////////////////////////////////
+  function postAnalize(x, y, array) {
     for(let z = 0; z < 9; z++) {
-      if((matrix[x][z] != matrix[x][y]) && (matrix[z][y] != matrix[x][y])) {
-        if(matrix[x][z].num[matrix[x][y].name - 1] == matrix[x][y].name) {
-          matrix[x][z].num[matrix[x][y].name - 1] = 0;
+      if((array[x][z] != array[x][y]) && (array[z][y] != array[x][y])) {
+        if(array[x][z].num[array[x][y].name - 1] == array[x][y].name) {
+          array[x][z].num[array[x][y].name - 1] = 0;
         }
-        if(matrix[z][y].num[matrix[x][y].name - 1] == matrix[x][y].name) {
-          matrix[z][y].num[matrix[x][y].name - 1] = 0;
+        if(array[z][y].num[array[x][y].name - 1] == array[x][y].name) {
+          array[z][y].num[array[x][y].name - 1] = 0;
         }
       }
     }
@@ -360,9 +365,9 @@ module.exports = function solveSudoku(matrix) {
     }
     while(q < qc) {
       while(w < wc) {
-        if(matrix[q][w] != matrix[x][y]) {
-          if(matrix[q][w].num[matrix[x][y].name - 1] == matrix[x][y].name) {
-            matrix[q][w].num[matrix[x][y].name - 1] = 0;
+        if(array[q][w] != array[x][y]) {
+          if(array[q][w].num[array[x][y].name - 1] == array[x][y].name) {
+            array[q][w].num[array[x][y].name - 1] = 0;
           }
         }
         w++;
@@ -370,7 +375,105 @@ module.exports = function solveSudoku(matrix) {
       q++;
       w-=3;
     }
+    return array;
   }
+  ////////////////////////////////////////////////////////////////////////////
+  function recursion(array) {
+    let key;
+    let bomba = array;
+    let count = 0, zero = 0;
+    for(let q= 0; q < 9; q++) {
+      for(let i= 1; i < 10; i++) {
+        count = 0;
+        for(let w = 0; w < 9; w++) {
+          if(bomba[q][w].name == i) count++;
+          if(bomba[q][w].name == 0) zero++;
+        }
+        if(count > 1) break;
+        if(zero > 0) break;
+      }
+      if(count > 1) break;
+      if(zero > 0) break;
+    }
+    if((count == 1) && (zero == 0)) {
+      for(let w= 0; w < 9; w++) {
+        for(let i= 1; i < 10; i++) {
+          count = 0;
+          for(let q = 0; q < 9; q++) {
+            if(bomba[w][q].name == i) count++;
+            if(bomba[w][q].name == 0) zero++;
+          }
+          if(count > 1) break;
+          if(zero > 0) break;
+        }
+        if(count > 1) break;
+        if(zero > 0) break;
+      }
+    }
+    if(zero > 0) {
+      for(let q = 0; q < 9; q++) {
+        for(let w = 0; w < 9; w++) {
+          if(bomba[q][w].name == 0) {
+            bomba = analize(q, w, bomba);
+            bomba = rowAnalize(q, w, bomba);
+            bomba = columnAnalize(q, w, bomba);
+            bomba = oneInPozition(q, w, bomba);
+            if(bomba[q][w].name == 0) {
+              for(let i = 0; i < 9; i++) {
+                if(bomba[q][w].num[i] != 0) {
+                  bomba[q][w].name = bomba[q][w].num[i];
+                  bomba[q][w].num = [];
+                  bomba = postAnalize(q, w, bomba);
+                  key = recursion(bomba);
+                  if((typeof key) != undefined) {
+                    return bomba;
+                  }
+                  ///////////////////////////////////////////////////////////
+                  let rout = 0;
+                  for(let x= 0; x < 9; x++) {
+                    for(let z= 1; z < 10; z++) {
+                      rout = 0;
+                      for(let y = 0; y < 9; y++) {
+                        if(bomba[x][y].name == z) rout++;
+                      }
+                      if(rout > 1) break;
+                    }
+                    if(rout > 1) break;
+                  }
+                  if((rout == 1) && (zero == 0)) {
+                    for(let y= 0; y < 9; y++) {
+                      for(let z= 1; z < 10; z++) {
+                        rout = 0;
+                        for(let x = 0; x < 9; x++) {
+                          if(bomba[y][x].name == z) rout++;
+                        }
+                        if(rout > 1) break;
+                      }
+                      if(rout > 1) break;
+                    }
+                  }
+                  if(rout > 1) {
+                    bomba = array;
+                  }
+                  else console.log("Надеюсь вы это не увидите!");
+                  ////////////////////////////////////////
+                }
+              }
+            }
+            else if(bomba[q][w].name != 0) {
+              bomba = postAnalize(q, w, bomba);
+              q = 0;
+              w = 0;
+            }
+          }
+        }
+      }
+    }
+    if((count == 1) && (zero == 0)) {
+      return bomba;
+    }
+  }
+
   ////////////////////////////////////////////////////////////////////////////
   for(let x= 0; x < 9; x++) {
     for(let y= 0; y < 9; y++) {
@@ -383,7 +486,7 @@ module.exports = function solveSudoku(matrix) {
   for(let x= 0; x < 9; x++) {
     for(let y= 0; y < 9; y++) {
       if(matrix[x][y].name == 0) {
-        analize(x, y);
+        matrix = analize(x,y,matrix);
         if(matrix[x][y].name != 0) {
           x = 0;
           y = 0;
@@ -394,20 +497,49 @@ module.exports = function solveSudoku(matrix) {
   for(let x= 0; x < 9; x++) {
     for(let y= 0; y < 9; y++) {
       if(matrix[x][y].name == 0) {
-        analize(x,y);
-        rowAnalize(x, y);
-        columnAnalize(x, y);
-        oneInPozition(x, y);
+        matrix = analize(x,y,matrix);
+        matrix = rowAnalize(x,y,matrix);
+        matrix = columnAnalize(x,y,matrix);
+        matrix = oneInPozition(x,y,matrix);
         if(matrix[x][y].name == 0) {
-          update(x, y);
+          update(x,y,matrix);
         }
         if(matrix[x][y].name != 0) {
-          postAnalize(x,y);
+          matrix = postAnalize(x,y,matrix);
           x = 0;
           y = 0;
         }
       }
     }
+  }
+  for(let x= 0; x < 9; x++) {
+    for(let y= 0; y < 9; y++) {
+      if(matrix[x][y].name == 0) {
+        matrix = analize(x,y,matrix);
+        matrix = rowAnalize(x,y,matrix);
+        matrix = columnAnalize(x,y,matrix);
+        matrix = oneInPozition(x,y,matrix);
+        if(matrix[x][y].name == 0) {
+          update(x,y,matrix);
+        }
+        if(matrix[x][y].name != 0) {
+          matrix = postAnalize(x,y,matrix);
+          x = 0;
+          y = 0;
+        }
+      }
+    }
+  }
+  let count = 0;
+  for(let x= 0; x < 9; x++) {
+    for(let y= 0; y < 9; y++) {
+      if(matrix[x][y].name == 0) {
+        count++;
+      }
+    }
+  }
+  if(count != 0) {
+    matrix = recursion(matrix);
   }
   for(let x= 0; x < 9; x++) {
     for(let y= 0; y < 9; y++) {
