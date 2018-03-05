@@ -82,7 +82,6 @@ module.exports = function solveSudoku(matrix) {
         }
       }
       matrix[x][y].name = 0;
-      return false;
     }
     else return recursion(x, y+1);
   }
